@@ -26,6 +26,12 @@ echo "## 1. 检查依赖"
 
 FAILED=0
 
+prints_usage() {
+  local output
+  output="$("$1" 2>&1 || true)"
+  printf '%s\n' "$output" | grep -q "Usage:"
+}
+
 # bash 4+
 if [ -n "${BASH_VERSION:-}" ]; then
   MAJOR=$(echo "$BASH_VERSION" | cut -d. -f1)
@@ -114,14 +120,14 @@ else
   FAILED=$((FAILED + 1))
 fi
 
-if "$SKILL_TARGET/scripts/validate-bundle.sh" 2>&1 | grep -q "Usage:"; then
+if prints_usage "$SKILL_TARGET/scripts/validate-bundle.sh"; then
   echo "  ✓ scripts/validate-bundle.sh 可执行"
 else
   echo "  ✗ scripts/validate-bundle.sh 不可执行或行为异常" >&2
   FAILED=$((FAILED + 1))
 fi
 
-if "$SKILL_TARGET/scripts/create-bundle.sh" 2>&1 | grep -q "Usage:"; then
+if prints_usage "$SKILL_TARGET/scripts/create-bundle.sh"; then
   echo "  ✓ scripts/create-bundle.sh 可执行"
 else
   echo "  ✗ scripts/create-bundle.sh 不可执行或行为异常" >&2
